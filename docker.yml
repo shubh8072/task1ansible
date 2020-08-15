@@ -1,0 +1,33 @@
+- hosts: all
+  tasks:
+     - package:
+          name: python36
+          state: present 
+     - name: installing docker library
+       pip:
+              name: docker-py
+     - yum_repository:
+              name: docker
+              baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
+              description: docker configuration
+              enabled: true
+              state: present
+              gpgcheck: no
+     - command: "yum install docker-ce -y --nobest"
+     - service:
+              name: docker
+              state: started
+              enabled: yes
+     - name: pull an image
+       docker_image:
+              name: httpd
+              source: pull        
+
+     - name: launching apache server in docker
+       docker_container:
+                name: webserver
+                image: httpd
+                state: started
+                exposed_ports: "80"
+                ports: "80:80"
+                volumes: /root:/usr/local/apache2/htdocs/ 
